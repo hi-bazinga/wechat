@@ -1,2 +1,2 @@
 # wechat
-wechat ID: zxc_zone, Name: ZXCZONE
+wechat official ID: zxc_zone, Name: ZXCZONE

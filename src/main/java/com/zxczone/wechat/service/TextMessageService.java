@@ -45,6 +45,15 @@ public class TextMessageService {
         return textToXML(myName, clientName, replyText);
     }
     
+    public String processVoiceMsg(Map<String, String> messageMap) {
+        String clientName = messageMap.get(MessageUtil.TAG_FROM_USER_NAME);
+        String myName = messageMap.get(MessageUtil.TAG_TO_USER_NAME);
+        String recognition = messageMap.get(MessageUtil.TAG_RECOGNITION);
+        
+        String replyText = recognition == null ? "未开通语音识别功能" : getReplyFromRobot(recognition, clientName);
+        return textToXML(myName, clientName, replyText);
+    }
+    
     public String buildSubScribeReply(Map<String, String> messageMap){
         String clientName = messageMap.get(MessageUtil.TAG_FROM_USER_NAME);
         String myName = messageMap.get(MessageUtil.TAG_TO_USER_NAME);

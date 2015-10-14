@@ -33,7 +33,8 @@ public class CoreService {
         
         try {
             Map<String, String> messageMap = XMLConvertor.parseXMLFromRequest(request);
-        
+            LOG.debug("Request message map: \n" + messageMap.toString());
+            
             String msgType = messageMap.get(MessageUtil.TAG_MSG_TYPE);
             
             switch (msgType) {
@@ -53,10 +54,17 @@ public class CoreService {
                     }
                     break;
                 }
+                
+                /* Voice Message */
+                case MessageUtil.REQ_MSG_TYPE_VOICE: {
+                    responseXML = txtMsgService.processVoiceMsg(messageMap);
+                    break;
+                }
                     
                 /* Text Message*/
                 case MessageUtil.REQ_MSG_TYPE_TEXT: {
                     responseXML = txtMsgService.processTextMsg(messageMap);
+                    break;
                 }
             }
         } catch (IOException | DocumentException e) {

@@ -30,5 +30,6 @@ public class MessageUtil {
     public static final String TAG_CREATE_TIME = "CreateTime";
     public static final String TAG_CONTENT = "Content";
     public static final String TAG_EVENT = "Event";
+    public static final String TAG_RECOGNITION = "Recognition";
     
 }
