@@ -16,7 +16,7 @@ import com.zxczone.wechat.util.FaceUtil;
 import com.zxczone.wechat.util.MessageUtil;
 
 /**
- * Service for processing text message
+ * Service for processing request message
  *
  * @author Jason Zhao
  */
@@ -24,16 +24,15 @@ import com.zxczone.wechat.util.MessageUtil;
 public class MessageHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(MessageHandler.class);
-    
     private static final RestTemplate restTmpl = new RestTemplate();
     
     private static final String API_KEY = "6747ba7946ccea6390d600a68dcaa337";
-    
     private static final String ROBOT_ERROR_MSG = "你在说啥，有点听不懂。。。";
+    private static final String VOICE_RECOG_NOT_OPEN_MSG = "未开通语音识别功能";
     
     /**
-     * Process request message map, reply message in XML format
-     * @param messageMap
+     * Process text request, get response message in XML
+     * @param messageMap parameter map parsed from request
      * @return
      */
     public static String processTextMsg(Map<String, String> messageMap) {
@@ -50,42 +49,76 @@ public class MessageHandler {
         return textToXML(myName, clientName, replyText);
     }
     
+    /**
+     * Process voice request, get response message in XML
+     * @param messageMap parameter map parsed from request
+     * @return
+     */
     public static String processVoiceMsg(Map<String, String> messageMap) {
         String clientName = messageMap.get(MessageUtil.TAG_FROM_USER_NAME);
         String myName = messageMap.get(MessageUtil.TAG_TO_USER_NAME);
         String recognition = messageMap.get(MessageUtil.TAG_RECOGNITION);
         
-        String replyText = recognition == null ? "未开通语音识别功能" : getReplyFromRobot(recognition, clientName);
+        String replyText = recognition == null ? VOICE_RECOG_NOT_OPEN_MSG : getReplyFromRobot(recognition, clientName);
         return textToXML(myName, clientName, replyText);
     }
     
+    /**
+     * Process link request, get response message in XML
+     * @param messageMap parameter map parsed from request
+     * @return
+     */
     public static String processLinkMsg(Map<String, String> messageMap) {
+        //TODO
         return null;
     }
     
+    /**
+     * Process location request, get response message in XML
+     * @param messageMap parameter map parsed from request
+     * @return
+     */
     public static String processLocationMsg(Map<String, String> messageMap) {
+        //TODO
         return null;
     }
     
+    /**
+     * Process image request, get response message in XML
+     * @param messageMap parameter map parsed from request
+     * @return
+     */
     public static String processImageMsg(Map<String, String> messageMap) {
+        //TODO
         return null;
     }
     
-    public static String buildSubScribeReply(Map<String, String> messageMap){
+    /**
+     * Process subscribe event, get response message in XML
+     * @param messageMap parameter map parsed from request
+     * @return
+     */
+    public static String processSubScribeReply(Map<String, String> messageMap){
         String clientName = messageMap.get(MessageUtil.TAG_FROM_USER_NAME);
         String myName = messageMap.get(MessageUtil.TAG_TO_USER_NAME);
         
         return textToXML(myName, clientName, "熊孩子，怎么现在才关注我！");
     }
     
-    public static String textToXML(String myName, String replyToName, String replyMsg){
+    /**
+     * Build XML for text response
+     * @param senderName sender ID
+     * @param receiverName receiver ID
+     * @param message message content
+     * @return
+     */
+    public static String textToXML(String senderName, String receiverName, String message){
         ResTextMessage resMsg = new ResTextMessage();
-        
-        resMsg.setFromUserName(myName);
-        resMsg.setToUserName(replyToName);
+        resMsg.setFromUserName(senderName);
+        resMsg.setToUserName(receiverName);
         resMsg.setCreateTime(new Date().getTime());
         resMsg.setMsgType(MessageUtil.RES_MSG_TYPE_TEXT);
-        resMsg.setContent(replyMsg);
+        resMsg.setContent(message);
             
         return XMLConvertor.textMsgToXML(resMsg);
     }
@@ -105,7 +138,6 @@ public class MessageHandler {
             String replyJson = restTmpl.getForObject(url, String.class);
             RobotReply reply = new ObjectMapper().readValue(replyJson, RobotReply.class);
             replyStr = reply.getText();
-            
         } catch (IOException e) {
             LOG.error(e.getMessage(), e);
             replyStr = ROBOT_ERROR_MSG;
@@ -116,6 +148,11 @@ public class MessageHandler {
     }
 }
 
+/**
+ * Pojo for robot reply
+ *
+ * @author Jason Zhao
+ */
 class RobotReply {
     private String code;
     private String text;

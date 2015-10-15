@@ -14,7 +14,7 @@ import com.zxczone.wechat.message.parser.XMLConvertor;
 import com.zxczone.wechat.util.MessageUtil;
 
 /**
- * Core service for processing request
+ * Service for dispatch request
  *
  * @author Jason Zhao
  */
@@ -38,7 +38,7 @@ public class CoreService {
                     String eventType = messageMap.get(MessageUtil.TAG_EVENT);  
     
                     if (eventType.equals(MessageUtil.EVENT_TYPE_SUBSCRIBE)) {
-                        responseXML = MessageHandler.buildSubScribeReply(messageMap);
+                        responseXML = MessageHandler.processSubScribeReply(messageMap);
                     } else if (eventType.equals(MessageUtil.EVENT_TYPE_UNSUBSCRIBE)) {  
                         LOG.debug(String.format("User %s has unsubscribed!", messageMap.get(MessageUtil.TAG_FROM_USER_NAME)));
                     } else if (eventType.equals(MessageUtil.EVENT_TYPE_CLICK)) {  
