@@ -20,9 +20,9 @@ import com.zxczone.wechat.util.MessageUtil;
  * @author Jason Zhao
  */
 @Service
-public class TextMessageService {
+public class MessageHandler {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TextMessageService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MessageHandler.class);
     
     private static final RestTemplate restTmpl = new RestTemplate();
     
@@ -35,7 +35,7 @@ public class TextMessageService {
      * @param messageMap
      * @return
      */
-    public String processTextMsg(Map<String, String> messageMap) {
+    public static String processTextMsg(Map<String, String> messageMap) {
         String clientName = messageMap.get(MessageUtil.TAG_FROM_USER_NAME);
         String myName = messageMap.get(MessageUtil.TAG_TO_USER_NAME);
         String content = messageMap.get(MessageUtil.TAG_CONTENT);
@@ -45,7 +45,7 @@ public class TextMessageService {
         return textToXML(myName, clientName, replyText);
     }
     
-    public String processVoiceMsg(Map<String, String> messageMap) {
+    public static String processVoiceMsg(Map<String, String> messageMap) {
         String clientName = messageMap.get(MessageUtil.TAG_FROM_USER_NAME);
         String myName = messageMap.get(MessageUtil.TAG_TO_USER_NAME);
         String recognition = messageMap.get(MessageUtil.TAG_RECOGNITION);
@@ -54,14 +54,14 @@ public class TextMessageService {
         return textToXML(myName, clientName, replyText);
     }
     
-    public String buildSubScribeReply(Map<String, String> messageMap){
+    public static String buildSubScribeReply(Map<String, String> messageMap){
         String clientName = messageMap.get(MessageUtil.TAG_FROM_USER_NAME);
         String myName = messageMap.get(MessageUtil.TAG_TO_USER_NAME);
         
         return textToXML(myName, clientName, "熊孩子，怎么现在才关注我！");
     }
     
-    public String textToXML(String myName, String replyToName, String replyMsg){
+    public static String textToXML(String myName, String replyToName, String replyMsg){
         ResTextMessage resMsg = new ResTextMessage();
         
         resMsg.setFromUserName(myName);
@@ -79,7 +79,7 @@ public class TextMessageService {
      * @param userId
      * @return
      */
-    public String getReplyFromRobot(String message, String userId) {
+    public static String getReplyFromRobot(String message, String userId) {
         String url = String.format("http://www.tuling123.com/openapi/api?key=%s&info=%s&userid=%s", API_KEY, message, userId); 
         LOG.debug("Get reply from robot: " + url);
         

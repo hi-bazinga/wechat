@@ -24,19 +24,14 @@ public class CoreService {
     
     private static final Logger LOG = LoggerFactory.getLogger(CoreService.class);
     
-    @Autowired
-    TextMessageService txtMsgService;
-    
     public String processRequest(HttpServletRequest request){
-        
         String responseXML = null;
         
         try {
             Map<String, String> messageMap = XMLConvertor.parseXMLFromRequest(request);
-            LOG.debug("Request message map: \n" + messageMap.toString());
+            LOG.debug("Request message map: " + messageMap.toString());
             
             String msgType = messageMap.get(MessageUtil.TAG_MSG_TYPE);
-            
             switch (msgType) {
             
                 /* Event Message */
@@ -44,11 +39,9 @@ public class CoreService {
                     String eventType = messageMap.get(MessageUtil.TAG_EVENT);  
     
                     if (eventType.equals(MessageUtil.EVENT_TYPE_SUBSCRIBE)) {
-                        responseXML = txtMsgService.buildSubScribeReply(messageMap);
-                        
+                        responseXML = MessageHandler.buildSubScribeReply(messageMap);
                     } else if (eventType.equals(MessageUtil.EVENT_TYPE_UNSUBSCRIBE)) {  
                         LOG.debug(String.format("User %s has unsubscribed!", messageMap.get(MessageUtil.TAG_FROM_USER_NAME)));
-                    
                     } else if (eventType.equals(MessageUtil.EVENT_TYPE_CLICK)) {  
                         //TODO
                     }
@@ -57,18 +50,18 @@ public class CoreService {
                 
                 /* Voice Message */
                 case MessageUtil.REQ_MSG_TYPE_VOICE: {
-                    responseXML = txtMsgService.processVoiceMsg(messageMap);
+                    responseXML = MessageHandler.processVoiceMsg(messageMap);
                     break;
                 }
                     
                 /* Text Message*/
                 case MessageUtil.REQ_MSG_TYPE_TEXT: {
-                    responseXML = txtMsgService.processTextMsg(messageMap);
+                    responseXML = MessageHandler.processTextMsg(messageMap);
                     break;
                 }
             }
         } catch (IOException | DocumentException e) {
-            LOG.error("Failed to parse XML from request!");
+            LOG.error(e.getMessage(), e);
         }
         
         return responseXML;
