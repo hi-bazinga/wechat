@@ -19,7 +19,7 @@ import com.thoughtworks.xstream.core.util.QuickWriter;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
 import com.thoughtworks.xstream.io.xml.XppDriver;
-import com.zxczone.wechat.message.response.ResTextMessage;
+import com.zxczone.wechat.pojo.response.ResTextMessage;
 
 /**
  * TODO

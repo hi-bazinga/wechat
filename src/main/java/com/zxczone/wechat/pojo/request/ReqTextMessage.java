@@ -1,7 +1,7 @@
-package com.zxczone.wechat.message.request;
+package com.zxczone.wechat.pojo.request;
 
 /**
- * Text Message
+ * Request Text Message
  *
  * @author Jason Zhao
  */

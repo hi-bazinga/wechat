@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.zxczone.wechat.message.parser.XMLConvertor;
@@ -54,9 +53,27 @@ public class CoreService {
                     break;
                 }
                     
-                /* Text Message*/
+                /* Text Message */
                 case MessageUtil.REQ_MSG_TYPE_TEXT: {
                     responseXML = MessageHandler.processTextMsg(messageMap);
+                    break;
+                }
+                
+                /* Link Message */
+                case MessageUtil.REQ_MSG_TYPE_LINK: {
+                    responseXML = MessageHandler.processLinkMsg(messageMap);
+                    break;
+                }
+                
+                /* Location Message */
+                case MessageUtil.REQ_MSG_TYPE_LOCATION: {
+                    responseXML = MessageHandler.processLocationMsg(messageMap);
+                    break;
+                }
+                
+                /* Image Message */
+                case MessageUtil.REQ_MSG_TYPE_IMAGE: {
+                    responseXML = MessageHandler.processImageMsg(messageMap);
                     break;
                 }
             }

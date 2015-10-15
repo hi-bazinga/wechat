@@ -1,11 +1,11 @@
-package com.zxczone.wechat.message.response;
+package com.zxczone.wechat.pojo.request;
 
 /**
- * Base Class of Response Message
+ * Base Class of Request Message
  *
  * @author Jason Zhao
  */
-public class ResMessage {
+public class ReqMessage {
 
     private String ToUserName;
     
@@ -14,6 +14,8 @@ public class ResMessage {
     private long CreateTime;
     
     private String MsgType;
+    
+    private long MsgId;
 
     public String getToUserName() {
         return ToUserName;
@@ -46,6 +48,13 @@ public class ResMessage {
     public void setMsgType(String msgType) {
         MsgType = msgType;
     }
-    
-    
+
+    public long getMsgId() {
+        return MsgId;
+    }
+
+    public void setMsgId(long msgId) {
+        MsgId = msgId;
+    }
+
 }

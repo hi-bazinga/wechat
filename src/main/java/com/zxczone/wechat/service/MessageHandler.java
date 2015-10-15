@@ -11,7 +11,8 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zxczone.wechat.message.parser.XMLConvertor;
-import com.zxczone.wechat.message.response.ResTextMessage;
+import com.zxczone.wechat.pojo.response.ResTextMessage;
+import com.zxczone.wechat.util.FaceUtil;
 import com.zxczone.wechat.util.MessageUtil;
 
 /**
@@ -40,8 +41,12 @@ public class MessageHandler {
         String myName = messageMap.get(MessageUtil.TAG_TO_USER_NAME);
         String content = messageMap.get(MessageUtil.TAG_CONTENT);
         
-        String replyText = getReplyFromRobot(content, clientName);
+        /* Handle wechat face content */
+        if (FaceUtil.isWXFace(content)) {
+            content = FaceUtil.faceToText(content);
+        }
         
+        String replyText = getReplyFromRobot(content, clientName);
         return textToXML(myName, clientName, replyText);
     }
     
@@ -52,6 +57,18 @@ public class MessageHandler {
         
         String replyText = recognition == null ? "未开通语音识别功能" : getReplyFromRobot(recognition, clientName);
         return textToXML(myName, clientName, replyText);
+    }
+    
+    public static String processLinkMsg(Map<String, String> messageMap) {
+        return null;
+    }
+    
+    public static String processLocationMsg(Map<String, String> messageMap) {
+        return null;
+    }
+    
+    public static String processImageMsg(Map<String, String> messageMap) {
+        return null;
     }
     
     public static String buildSubScribeReply(Map<String, String> messageMap){

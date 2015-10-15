@@ -1,4 +1,4 @@
-package com.zxczone.wechat.message.response;
+package com.zxczone.wechat.pojo.response;
 
 /**
  * Response Text Message
