@@ -14,7 +14,7 @@ import com.zxczone.wechat.service.CoreService;
 import com.zxczone.wechat.util.SignUtil;
 
 /**
- * TODO
+ * Handle GET and POST request
  *
  * @author Jason Zhao
  */
@@ -46,7 +46,7 @@ public class MessageController {
     @ResponseBody public String receiveMsg(HttpServletRequest request) {
 
         String resXML = coreService.processRequest(request);
-        LOG.debug("\n" + resXML);
+        LOG.debug("Response XML: \n" + resXML);
         
         return resXML;
     }
