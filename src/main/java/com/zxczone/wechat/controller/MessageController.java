@@ -41,7 +41,6 @@ public class MessageController {
                 && VerifyUtil.checkSignature(signature, timestamp, nonce)) {
             responseStr = echostr;
             LOG.info("Verification completed!");
-            
         } else {
             responseStr = "Verification failed!";
             LOG.error(responseStr);
@@ -66,7 +65,6 @@ public class MessageController {
         }
         
         String resXML = coreService.processRequest(request);
-        
         LOG.debug("Response XML: \n" + resXML);
         
         return resXML;

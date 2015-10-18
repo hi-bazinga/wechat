@@ -22,7 +22,7 @@ import com.thoughtworks.xstream.io.xml.XppDriver;
 import com.zxczone.wechat.pojo.response.ResTextMessage;
 
 /**
- * TODO
+ * XML processor
  *
  * @author Jason Zhao
  */
@@ -49,11 +49,15 @@ public class XMLConvertor {
         return map;  
     }
     
+    /**
+     * Convert text message object to XML format
+     * @param message
+     * @return
+     */
     public static String textMsgToXML(ResTextMessage message) {
         XStream stream = new XStream(new XppDriver(){
             public HierarchicalStreamWriter createWriter(Writer out) {  
                 return new PrettyPrintWriter(out) {  
-
                     boolean cdata = true;  
           
                     public void startNode(String name, @SuppressWarnings("rawtypes") Class clazz) {  
@@ -62,9 +66,7 @@ public class XMLConvertor {
           
                     protected void writeText(QuickWriter writer, String text) {  
                         if (cdata) {  
-                            writer.write("<![CDATA[");  
-                            writer.write(text);  
-                            writer.write("]]>");  
+                            writer.write("<![CDATA[" + text + "]]>");  
                         } else {  
                             writer.write(text);  
                         }  
@@ -74,7 +76,6 @@ public class XMLConvertor {
         });
         
         stream.alias("xml", ResTextMessage.class);
-        
         return stream.toXML(message);
     }
     
