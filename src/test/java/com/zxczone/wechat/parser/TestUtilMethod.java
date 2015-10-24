@@ -15,6 +15,6 @@ public class TestUtilMethod {
     
     @Test
     public void testBaiduAPI(){
-        CoreMessageHandler.getLocInfoByCoord("31.283108", "121.493474");
+        CoreMessageHandler.getLocInfoByCoord("31.304907", "121.514397");
     }
 }

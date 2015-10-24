@@ -2,6 +2,7 @@ package com.zxczone.wechat.service;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -9,9 +10,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zxczone.wechat.message.parser.XMLConvertor;
 import com.zxczone.wechat.pojo.BaiduResponse;
+import com.zxczone.wechat.pojo.CoordConvResult;
 import com.zxczone.wechat.pojo.LocationInfo;
 import com.zxczone.wechat.pojo.RobotReply;
 import com.zxczone.wechat.pojo.response.ResTextMessage;
@@ -134,23 +137,39 @@ public class CoreMessageHandler {
     }
     
     /**
-     * Get location information by coordinate
-     * @param locX latitude
-     * @param locY longitude
+     * Get location information by wechat coordinate. <br><br>
+     * Wechat coordinate needs to be converted to baidu coordinate before calling baidu API.
+     * @param lat wechat latitude
+     * @param lng wechat longitude
      * @return
      */
-    public static LocationInfo getLocInfoByCoord(String locX, String locY) {
-        String baiduURL = String.format("http://api.map.baidu.com/geocoder/v2/?ak=%s&location=%s,%s&output=json",
-                Config.BAIDU_MAP_API_KEY, locX, locY);
-        LOG.debug("Get response from baidu map API: " + baiduURL);
+    public static LocationInfo getLocInfoByCoord(String lat, String lng) {
         
         LocationInfo locInfo = null;
         try {
-            String resJson = restTmpl.getForObject(baiduURL, String.class);
-            BaiduResponse baiduRes = new ObjectMapper().readValue(resJson, BaiduResponse.class);
+            /* Convert wechat coordinate to baidu coordinate */
+            String convertURL = String.format("http://api.map.baidu.com/geoconv/v1/?ak=%s&coords=%s,%s&from=3&to=5&output=json", 
+                    Config.BAIDU_MAP_API_KEY, lng, lat);
+            LOG.debug("Convert coordinate URL: " + convertURL);
+            
+            String convResJson = restTmpl.getForObject(convertURL, String.class);
+
+            BaiduResponse<List<CoordConvResult>> convResponse = new ObjectMapper().readValue(
+                    convResJson, new TypeReference<BaiduResponse<List<CoordConvResult>>>(){});
+            CoordConvResult convResult = convResponse.getResult().get(0);
+        
+            /* Get location information by baidu coordinate */
+            String locationURL = String.format("http://api.map.baidu.com/geocoder/v2/?ak=%s&location=%s,%s&output=json",
+                    Config.BAIDU_MAP_API_KEY, convResult.getY(), convResult.getX());
+            LOG.debug("Get location info URL: " + locationURL);
+        
+            String resJson = restTmpl.getForObject(locationURL, String.class);
+            
+            BaiduResponse<LocationInfo> baiduRes = new ObjectMapper().readValue(
+                    resJson, new TypeReference<BaiduResponse<LocationInfo>>(){});
             locInfo = baiduRes.getResult();
            
-        } catch (IOException e) {
+        } catch (Exception e) {
             LOG.error(e.getMessage(), e);
         }
         
@@ -182,5 +201,4 @@ public class CoreMessageHandler {
         return replyStr;
     }
 }
-
 

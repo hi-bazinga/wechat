@@ -1,15 +1,14 @@
 package com.zxczone.wechat.pojo;
 
 /**
- * TODO
  *
  * @author Jason Zhao
  */
-public class BaiduResponse {
+public class BaiduResponse<T> {
 
     private String status;
     
-    private LocationInfo result;
+    private T result;
     
     public String getStatus() {
         return status;
@@ -17,10 +16,10 @@ public class BaiduResponse {
     public void setStatus(String status) {
         this.status = status;
     }
-    public LocationInfo getResult() {
+    public T getResult() {
         return result;
     }
-    public void setResult(LocationInfo result) {
+    public void setResult(T result) {
         this.result = result;
     }
     
