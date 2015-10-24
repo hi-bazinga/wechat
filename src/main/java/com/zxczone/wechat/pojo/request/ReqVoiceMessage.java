@@ -5,10 +5,12 @@ package com.zxczone.wechat.pojo.request;
  *
  * @author Jason Zhao
  */
-public class ReqVoiceMessage {
+public class ReqVoiceMessage extends ReqMessage{
    
     private String MediaId;  
+    
     private String Format; 
+    
     private String Recognition;
     
     public String getMediaId() {

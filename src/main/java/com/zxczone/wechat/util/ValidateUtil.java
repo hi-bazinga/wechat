@@ -9,7 +9,7 @@ import org.apache.commons.codec.digest.DigestUtils;
  *
  * @author Jason Zhao
  */
-public class VerifyUtil {
+public class ValidateUtil {
     
     private static final String token = "zxczone";  
     

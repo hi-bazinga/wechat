@@ -19,9 +19,9 @@ import com.zxczone.wechat.util.MessageUtil;
  * @author Jason Zhao
  */
 @Service
-public class CoreService {
+public class MessageDispatcher {
     
-    private static final Logger LOG = LoggerFactory.getLogger(CoreService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MessageDispatcher.class);
     
     public String processRequest(HttpServletRequest request){
         String responseXML = null;
@@ -31,16 +31,18 @@ public class CoreService {
             LOG.debug("Request message map: " + messageMap.toString());
             
             String msgType = messageMap.get(MessageUtil.TAG_MSG_TYPE);
-            switch (msgType) {
+            LOG.debug("Message Type: " + msgType);
             
+            switch (msgType) {
                 /* Event Message */
                 case MessageUtil.REQ_MSG_TYPE_EVENT: {
                     String eventType = messageMap.get(MessageUtil.TAG_EVENT);  
     
                     if (eventType.equals(MessageUtil.EVENT_TYPE_SUBSCRIBE)) {
-                        responseXML = MessageHandler.processSubScribeReply(messageMap);
+                        responseXML = CoreMessageHandler.processSubScribeReply(messageMap);
+                        LOG.info(String.format("User %s has subscribed!", messageMap.get(MessageUtil.TAG_FROM_USER_NAME)));
                     } else if (eventType.equals(MessageUtil.EVENT_TYPE_UNSUBSCRIBE)) {  
-                        LOG.debug(String.format("User %s has unsubscribed!", messageMap.get(MessageUtil.TAG_FROM_USER_NAME)));
+                        LOG.info(String.format("User %s has unsubscribed!", messageMap.get(MessageUtil.TAG_FROM_USER_NAME)));
                     } else if (eventType.equals(MessageUtil.EVENT_TYPE_CLICK)) {  
                         //TODO
                     }
@@ -49,31 +51,31 @@ public class CoreService {
                 
                 /* Voice Message */
                 case MessageUtil.REQ_MSG_TYPE_VOICE: {
-                    responseXML = MessageHandler.processVoiceMsg(messageMap);
+                    responseXML = CoreMessageHandler.processVoiceMsg(messageMap);
                     break;
                 }
                     
                 /* Text Message */
                 case MessageUtil.REQ_MSG_TYPE_TEXT: {
-                    responseXML = MessageHandler.processTextMsg(messageMap);
+                    responseXML = CoreMessageHandler.processTextMsg(messageMap);
                     break;
                 }
                 
                 /* Link Message */
                 case MessageUtil.REQ_MSG_TYPE_LINK: {
-                    responseXML = MessageHandler.processLinkMsg(messageMap);
+                    responseXML = CoreMessageHandler.processLinkMsg(messageMap);
                     break;
                 }
                 
                 /* Location Message */
                 case MessageUtil.REQ_MSG_TYPE_LOCATION: {
-                    responseXML = MessageHandler.processLocationMsg(messageMap);
+                    responseXML = CoreMessageHandler.processLocationMsg(messageMap);
                     break;
                 }
                 
                 /* Image Message */
                 case MessageUtil.REQ_MSG_TYPE_IMAGE: {
-                    responseXML = MessageHandler.processImageMsg(messageMap);
+                    responseXML = CoreMessageHandler.processImageMsg(messageMap);
                     break;
                 }
             }

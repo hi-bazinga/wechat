@@ -6,7 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Utility class for face
+ * Utility class for handling face text
  *
  * @author Jason Zhao
  */
@@ -16,11 +16,16 @@ public class FaceUtil {
     
     private static Map<String, String> map = new HashMap<String, String>();
 
-    public static boolean isWXFace(String content) {  
+    /**
+     * 
+     * @param content
+     * @return
+     */
+    public static boolean isFaceText(String content) {  
         Pattern p = Pattern.compile(faceRegex);  
         Matcher m = p.matcher(content);  
         return m.matches();
-    }  
+    }
     
     public static String faceToText(String face){
         return map.containsKey(face) ? map.get(face) : face;
