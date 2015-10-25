@@ -141,7 +141,7 @@ public class CoreMessageHandler {
      * Wechat coordinate needs to be converted to baidu coordinate before calling baidu API.
      * @param lat wechat latitude
      * @param lng wechat longitude
-     * @return
+     * @return LocationInfo object, null if formatted address or sematic description is empty.
      */
     public static LocationInfo getLocInfoByCoord(String lat, String lng) {
         
@@ -167,7 +167,12 @@ public class CoreMessageHandler {
             
             BaiduResponse<LocationInfo> baiduRes = new ObjectMapper().readValue(
                     resJson, new TypeReference<BaiduResponse<LocationInfo>>(){});
-            locInfo = baiduRes.getResult();
+            LocationInfo tempLoc = baiduRes.getResult();
+            
+            if (tempLoc.getFormatted_address() != null
+                    && tempLoc.getSematic_description() != null) {
+                locInfo = tempLoc;
+            }
            
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
