@@ -2,7 +2,8 @@ package com.zxczone.wechat.parser;
 
 import org.junit.Test;
 
-import com.zxczone.wechat.service.CoreMessageHandler;
+import com.zxczone.wechat.service.CoreMessageService;
+import com.zxczone.wechat.service.TokenService;
 import com.zxczone.wechat.util.FaceUtil;
 
 public class TestUtilMethod {
@@ -15,6 +16,11 @@ public class TestUtilMethod {
     
     @Test
     public void testBaiduAPI(){
-        CoreMessageHandler.getLocInfoByCoord("31.304907", "121.514397");
+        CoreMessageService.getLocInfoByCoord("31.304907", "121.514397");
+    }
+    
+    @Test
+    public void testGetToken(){
+        TokenService.getAccessToken();
     }
 }

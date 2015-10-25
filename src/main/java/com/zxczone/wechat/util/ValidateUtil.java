@@ -25,4 +25,5 @@ public class ValidateUtil {
         
         return tmpSign != null ? tmpSign.equalsIgnoreCase(signature) : false;  
     }  
+    
 }

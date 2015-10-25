@@ -28,9 +28,9 @@ import com.zxczone.wechat.util.MessageUtil;
  * @author Jason Zhao
  */
 @Service
-public class CoreMessageHandler {
+public class CoreMessageService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CoreMessageHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CoreMessageService.class);
     private static final RestTemplate restTmpl = new RestTemplate();
    
     /**

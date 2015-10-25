@@ -39,7 +39,7 @@ public class MessageDispatcher {
                     String eventType = messageMap.get(MessageUtil.TAG_EVENT);  
     
                     if (eventType.equals(MessageUtil.EVENT_TYPE_SUBSCRIBE)) {
-                        responseXML = CoreMessageHandler.processSubScribeReply(messageMap);
+                        responseXML = CoreMessageService.processSubScribeReply(messageMap);
                         LOG.info(String.format("User %s has subscribed!", messageMap.get(MessageUtil.TAG_FROM_USER_NAME)));
                     } else if (eventType.equals(MessageUtil.EVENT_TYPE_UNSUBSCRIBE)) {  
                         LOG.info(String.format("User %s has unsubscribed!", messageMap.get(MessageUtil.TAG_FROM_USER_NAME)));
@@ -51,31 +51,31 @@ public class MessageDispatcher {
                 
                 /* Voice Message */
                 case MessageUtil.REQ_MSG_TYPE_VOICE: {
-                    responseXML = CoreMessageHandler.processVoiceMsg(messageMap);
+                    responseXML = CoreMessageService.processVoiceMsg(messageMap);
                     break;
                 }
                     
                 /* Text Message */
                 case MessageUtil.REQ_MSG_TYPE_TEXT: {
-                    responseXML = CoreMessageHandler.processTextMsg(messageMap);
+                    responseXML = CoreMessageService.processTextMsg(messageMap);
                     break;
                 }
                 
                 /* Link Message */
                 case MessageUtil.REQ_MSG_TYPE_LINK: {
-                    responseXML = CoreMessageHandler.processLinkMsg(messageMap);
+                    responseXML = CoreMessageService.processLinkMsg(messageMap);
                     break;
                 }
                 
                 /* Location Message */
                 case MessageUtil.REQ_MSG_TYPE_LOCATION: {
-                    responseXML = CoreMessageHandler.processLocationMsg(messageMap);
+                    responseXML = CoreMessageService.processLocationMsg(messageMap);
                     break;
                 }
                 
                 /* Image Message */
                 case MessageUtil.REQ_MSG_TYPE_IMAGE: {
-                    responseXML = CoreMessageHandler.processImageMsg(messageMap);
+                    responseXML = CoreMessageService.processImageMsg(messageMap);
                     break;
                 }
             }
