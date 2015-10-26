@@ -169,8 +169,10 @@ public class CoreMessageService {
                     resJson, new TypeReference<BaiduResponse<LocationInfo>>(){});
             LocationInfo tempLoc = baiduRes.getResult();
             
-            if (tempLoc.getFormatted_address() != null
-                    && tempLoc.getSematic_description() != null) {
+            if (tempLoc.getFormatted_address() != null 
+                    && !tempLoc.getFormatted_address().isEmpty()
+                    && tempLoc.getSematic_description() != null
+                    && !tempLoc.getSematic_description().isEmpty()) {
                 locInfo = tempLoc;
             }
            
