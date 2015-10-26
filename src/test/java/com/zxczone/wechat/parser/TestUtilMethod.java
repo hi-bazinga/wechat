@@ -3,6 +3,7 @@ package com.zxczone.wechat.parser;
 import org.junit.Test;
 
 import com.zxczone.wechat.service.CoreMessageService;
+import com.zxczone.wechat.service.MenuService;
 import com.zxczone.wechat.service.TokenService;
 import com.zxczone.wechat.util.FaceUtil;
 
@@ -22,5 +23,10 @@ public class TestUtilMethod {
     @Test
     public void testGetToken(){
         TokenService.getAccessToken();
+    }
+    
+    @Test
+    public void testCreateMenu(){
+        MenuService.createMenu();
     }
 }
