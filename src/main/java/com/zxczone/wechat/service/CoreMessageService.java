@@ -16,8 +16,8 @@ import com.zxczone.wechat.message.parser.XMLConvertor;
 import com.zxczone.wechat.pojo.BaiduResponse;
 import com.zxczone.wechat.pojo.CoordConvResult;
 import com.zxczone.wechat.pojo.LocationInfo;
-import com.zxczone.wechat.pojo.RobotReply;
 import com.zxczone.wechat.pojo.response.ResTextMessage;
+import com.zxczone.wechat.tuling.pojo.BaseResponse;
 import com.zxczone.wechat.util.Config;
 import com.zxczone.wechat.util.FaceUtil;
 import com.zxczone.wechat.util.MessageUtil;
@@ -197,7 +197,7 @@ public class CoreMessageService {
         String replyStr = "";
         try {
             String replyJson = restTmpl.getForObject(url, String.class);
-            RobotReply reply = new ObjectMapper().readValue(replyJson, RobotReply.class);
+            BaseResponse reply = new ObjectMapper().readValue(replyJson, BaseResponse.class);
             replyStr = reply.getText();
         } catch (IOException e) {
             LOG.error(e.getMessage(), e);
