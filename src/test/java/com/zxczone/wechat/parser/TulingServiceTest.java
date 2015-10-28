@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.zxczone.wechat.service.TulingService;
+import com.zxczone.wechat.tuling.pojo.BaseResponse;
 import com.zxczone.wechat.util.SpringBasedTest;
 
 /**
@@ -17,6 +18,7 @@ public class TulingServiceTest extends SpringBasedTest{
     
     @Test
     public void testTuling(){
-        tulingService.getReply("好", "qsdasd");
+        BaseResponse response = tulingService.getResponse("菜谱", "qsdasd");
+        System.out.println(response.getCode());
     }
 }

@@ -1,10 +1,13 @@
 package com.zxczone.wechat.tuling.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * Base response
  *
  * @author Jason Zhao
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class BaseResponse {
 
     private String code;

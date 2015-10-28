@@ -8,12 +8,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zxczone.wechat.tuling.pojo.BaseResponse;
+import com.zxczone.wechat.tuling.pojo.FlightInfo;
+import com.zxczone.wechat.tuling.pojo.LinkResponse;
+import com.zxczone.wechat.tuling.pojo.ListResponse;
+import com.zxczone.wechat.tuling.pojo.News;
+import com.zxczone.wechat.tuling.pojo.Recipe;
+import com.zxczone.wechat.tuling.pojo.TrainInfo;
 import com.zxczone.wechat.util.Config;
 
 /**
- * This class provide methods for Tuling API
+ * This class provide methods for Tuling API.
  *
  * @author Jason Zhao
  */
@@ -27,7 +34,16 @@ public class TulingService {
     
     private static final String API_URL_TEMPLATE = "http://www.tuling123.com/openapi/api?key=%s&info=%s&userid=%s";
     
-    public BaseResponse getReply(String message, String userId){
+    private static final String TEXT = "100000";
+    private static final String LINK = "200000";
+    private static final String NEWS = "302000";
+    private static final String TRAIN = "305000";
+    private static final String FLIGHT = "306000";
+    private static final String RECIPE = "308000";
+    
+    private static final ObjectMapper mapper = new ObjectMapper();
+    
+    public BaseResponse getResponse(String message, String userId){
         String url = String.format(API_URL_TEMPLATE, Config.TULING_API_KEY, message, userId);
         LOG.debug("Get response from tuling API: " + url);
         
@@ -39,11 +55,50 @@ public class TulingService {
              */
             String responseJson = restTmpl.getForObject(url, String.class);   
             response = new ObjectMapper().readValue(responseJson, BaseResponse.class);
+            response = completeResponseDetail(response, responseJson);
             
         } catch (IOException e) {
             LOG.error(e.getMessage(), e);
         }
         
         return response;
+    }
+    
+    /**
+     * Complete detail information for base response
+     * @param baseResp base response with only code and text
+     * @param json response json with detail information
+     * @return response with detail information
+     * @throws IOException
+     */
+    private BaseResponse completeResponseDetail(BaseResponse baseResp, String json) throws IOException {
+        String code = baseResp.getCode();
+        String text = baseResp.getText();
+        
+        BaseResponse resultResp = null;
+        switch(code) {
+            case TEXT:
+                resultResp = baseResp;
+                break;
+            case LINK:
+                resultResp = mapper.readValue(json, LinkResponse.class);
+                break;
+            case NEWS:
+                resultResp = mapper.readValue(json, new TypeReference<ListResponse<News>>(){});
+                break;
+            case TRAIN:
+                resultResp = mapper.readValue(json, new TypeReference<ListResponse<TrainInfo>>(){});
+                break;
+            case FLIGHT:
+                resultResp = mapper.readValue(json, new TypeReference<ListResponse<FlightInfo>>(){});
+                break;
+            case RECIPE:
+                resultResp = mapper.readValue(json, new TypeReference<ListResponse<Recipe>>(){});
+                break;
+            default:
+                throw new IOException(String.format("Error Code: %s, Message: %s", code, text));
+        }
+        
+        return resultResp;
     }
 }
