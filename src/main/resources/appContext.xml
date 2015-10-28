@@ -18,8 +18,6 @@
             			http://www.springframework.org/schema/aop
             			http://www.springframework.org/schema/aop/spring-aop-4.1.xsd">
 
-<!--     <bean id="appPropertiesConfig" class="org.apache.commons.configuration.PropertiesConfiguration" init-method="load">
-    	<property name="URL" value="classpath:face.properties" />
-    </bean> -->
+	<bean id="restTemplate" class="org.springframework.web.client.RestTemplate" />
 
 </beans>
