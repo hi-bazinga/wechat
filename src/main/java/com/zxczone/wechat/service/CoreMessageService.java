@@ -158,9 +158,14 @@ public class CoreMessageService {
         newsMsg.setCreateTime(new Date().getTime());
         newsMsg.setMsgType(MessageUtil.RES_MSG_TYPE_NEWS);
         
-        if (articles.size() > 10) {
-            newsMsg.setArticleCount(10);
-            newsMsg.setArticles(articles.subList(0, 10));
+        /* Don't use subList, otherwise XStream will generate malformed XML */
+        int limit = 5;
+        if (articles.size() > limit) {
+            newsMsg.setArticleCount(limit);
+            
+            List<Article> truncList = new ArrayList<Article>();
+            truncList.addAll(articles.subList(0, limit));
+            newsMsg.setArticles(truncList);
         } else {
             newsMsg.setArticleCount(articles.size());
             newsMsg.setArticles(articles);
@@ -242,7 +247,9 @@ public class CoreMessageService {
                 List<Recipe> recipeList = ((ListResponse<Recipe>) response).getList();
                 for (Recipe recipe : recipeList) {
                     Article ar = new Article();
-                    ar.setTitle(recipe.getName());
+                    /* Don't display details of the first article */
+                    String title = recipe.getName() + (articles.size() != 0 ? "\n" + recipe.getInfo() : "");
+                    ar.setTitle(title);
                     ar.setUrl(recipe.getDetailurl());
                     ar.setPicUrl(recipe.getIcon());
                     ar.setDescription(recipe.getInfo());
