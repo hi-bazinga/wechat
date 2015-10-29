@@ -1,12 +1,13 @@
 package com.zxczone.wechat.service;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -16,8 +17,13 @@ import com.zxczone.wechat.message.parser.XMLConvertor;
 import com.zxczone.wechat.pojo.BaiduResponse;
 import com.zxczone.wechat.pojo.CoordConvResult;
 import com.zxczone.wechat.pojo.LocationInfo;
+import com.zxczone.wechat.pojo.response.Article;
+import com.zxczone.wechat.pojo.response.ResNewsMessage;
 import com.zxczone.wechat.pojo.response.ResTextMessage;
 import com.zxczone.wechat.tuling.pojo.BaseResponse;
+import com.zxczone.wechat.tuling.pojo.LinkResponse;
+import com.zxczone.wechat.tuling.pojo.ListResponse;
+import com.zxczone.wechat.tuling.pojo.Recipe;
 import com.zxczone.wechat.util.Config;
 import com.zxczone.wechat.util.FaceUtil;
 import com.zxczone.wechat.util.MessageUtil;
@@ -29,6 +35,9 @@ import com.zxczone.wechat.util.MessageUtil;
  */
 @Service
 public class CoreMessageService {
+    
+    @Autowired
+    TulingService tulingService;
 
     private static final Logger LOG = LoggerFactory.getLogger(CoreMessageService.class);
     private static final RestTemplate restTmpl = new RestTemplate();
@@ -38,7 +47,7 @@ public class CoreMessageService {
      * @param messageMap parameter map parsed from request
      * @return
      */
-    public static String processTextMsg(Map<String, String> messageMap) {
+    public String processTextMsg(Map<String, String> messageMap) {
         String clientName = messageMap.get(MessageUtil.TAG_FROM_USER_NAME);
         String myName = messageMap.get(MessageUtil.TAG_TO_USER_NAME);
         String content = messageMap.get(MessageUtil.TAG_CONTENT);
@@ -48,8 +57,7 @@ public class CoreMessageService {
             content = FaceUtil.faceToText(content);
         }
         
-        String replyText = getReplyFromRobot(content, clientName);
-        return textToXML(myName, clientName, replyText);
+        return getResponseXMLFromRobot(myName, clientName, content);
     }
     
     /**
@@ -57,14 +65,13 @@ public class CoreMessageService {
      * @param messageMap parameter map parsed from request
      * @return
      */
-    public static String processVoiceMsg(Map<String, String> messageMap) {
+    public String processVoiceMsg(Map<String, String> messageMap) {
         String clientName = messageMap.get(MessageUtil.TAG_FROM_USER_NAME);
         String myName = messageMap.get(MessageUtil.TAG_TO_USER_NAME);
         String recognition = messageMap.get(MessageUtil.TAG_RECOGNITION);
         
-        String replyText = recognition == null ? MessageUtil.VOICE_RECOG_NOT_OPEN_MSG
-                : getReplyFromRobot(recognition, clientName);
-        return textToXML(myName, clientName, replyText);
+        return recognition == null ? MessageUtil.VOICE_RECOG_NOT_OPEN_MSG
+                : getResponseXMLFromRobot(myName, clientName, recognition);
     }
     
     /**
@@ -72,7 +79,7 @@ public class CoreMessageService {
      * @param messageMap parameter map parsed from request
      * @return
      */
-    public static String processLinkMsg(Map<String, String> messageMap) {
+    public String processLinkMsg(Map<String, String> messageMap) {
         //TODO
         return null;
     }
@@ -82,7 +89,7 @@ public class CoreMessageService {
      * @param messageMap parameter map parsed from request
      * @return
      */
-    public static String processLocationMsg(Map<String, String> messageMap) {
+    public String processLocationMsg(Map<String, String> messageMap) {
         String clientName = messageMap.get(MessageUtil.TAG_FROM_USER_NAME);
         String myName = messageMap.get(MessageUtil.TAG_TO_USER_NAME);
         String locX = messageMap.get(MessageUtil.TAG_LOCATION_X);
@@ -93,7 +100,7 @@ public class CoreMessageService {
                 locInfo.getFormatted_address(),
                 locInfo.getSematic_description()) : MessageUtil.MAP_ERROR_MSG;
 
-        return textToXML(myName, clientName, replyText);
+        return buildTextXML(myName, clientName, replyText);
     }
     
     /**
@@ -101,7 +108,7 @@ public class CoreMessageService {
      * @param messageMap parameter map parsed from request
      * @return
      */
-    public static String processImageMsg(Map<String, String> messageMap) {
+    public String processImageMsg(Map<String, String> messageMap) {
         //TODO
         return null;
     }
@@ -111,11 +118,11 @@ public class CoreMessageService {
      * @param messageMap parameter map parsed from request
      * @return
      */
-    public static String processSubScribeReply(Map<String, String> messageMap){
+    public String processSubScribeReply(Map<String, String> messageMap){
         String clientName = messageMap.get(MessageUtil.TAG_FROM_USER_NAME);
         String myName = messageMap.get(MessageUtil.TAG_TO_USER_NAME);
         
-        return textToXML(myName, clientName, "熊孩子，怎么现在才关注我！");
+        return buildTextXML(myName, clientName, "熊孩子，怎么现在才关注我！");
     }
     
     /**
@@ -125,7 +132,7 @@ public class CoreMessageService {
      * @param message message content
      * @return
      */
-    public static String textToXML(String senderName, String receiverName, String message){
+    public String buildTextXML(String senderName, String receiverName, String message){
         ResTextMessage resMsg = new ResTextMessage();
         resMsg.setFromUserName(senderName);
         resMsg.setToUserName(receiverName);
@@ -137,13 +144,39 @@ public class CoreMessageService {
     }
     
     /**
+     * Build XML for picture-text response
+     * @param senderName sender ID
+     * @param receiverName receiver ID
+     * @param  message content
+     * @param articles article list
+     * @return
+     */
+    public String buildNewsXML(String senderName, String receiverName, List<Article> articles){
+        ResNewsMessage newsMsg = new ResNewsMessage();
+        newsMsg.setFromUserName(senderName);
+        newsMsg.setToUserName(receiverName);
+        newsMsg.setCreateTime(new Date().getTime());
+        newsMsg.setMsgType(MessageUtil.RES_MSG_TYPE_NEWS);
+        
+        if (articles.size() > 10) {
+            newsMsg.setArticleCount(10);
+            newsMsg.setArticles(articles.subList(0, 10));
+        } else {
+            newsMsg.setArticleCount(articles.size());
+            newsMsg.setArticles(articles);
+        }
+            
+        return XMLConvertor.newsMsgToXML(newsMsg);
+    }
+    
+    /**
      * Get location information by wechat coordinate. <br><br>
      * Wechat coordinate needs to be converted to baidu coordinate before calling baidu API.
      * @param lat wechat latitude
      * @param lng wechat longitude
      * @return LocationInfo object, null if formatted address or sematic description is empty.
      */
-    public static LocationInfo getLocInfoByCoord(String lat, String lng) {
+    public LocationInfo getLocInfoByCoord(String lat, String lng) {
         
         LocationInfo locInfo = null;
         try {
@@ -189,23 +222,41 @@ public class CoreMessageService {
      * @param userId
      * @return
      */
-    public static String getReplyFromRobot(String message, String userId) {
-        String url = String.format("http://www.tuling123.com/openapi/api?key=%s&info=%s&userid=%s", 
-                Config.TULING_API_KEY, message, userId); 
-        LOG.debug("Get reply from robot: " + url);
+    public String getResponseXMLFromRobot(String myName, String clientName, String message) {
+        BaseResponse response = tulingService.getResponse(message, clientName);
+        String code = response.getCode();
+        String text = response.getText();
         
-        String replyStr = "";
-        try {
-            String replyJson = restTmpl.getForObject(url, String.class);
-            BaseResponse reply = new ObjectMapper().readValue(replyJson, BaseResponse.class);
-            replyStr = reply.getText();
-        } catch (IOException e) {
-            LOG.error(e.getMessage(), e);
-            replyStr = MessageUtil.ROBOT_ERROR_MSG;
+        String responseXML = null;
+        switch(code) {
+            case TulingService.LINK: {
+                String url = ((LinkResponse) response).getUrl();
+                String respText = String.format("%s, <a href=\"％s\">%s</a>", text, url, url);
+                responseXML = buildTextXML(myName, clientName, respText);
+                break;
+            }
+            case TulingService.RECIPE: {
+                List<Article> articles = new ArrayList<Article>();
+                
+                @SuppressWarnings("unchecked")
+                List<Recipe> recipeList = ((ListResponse<Recipe>) response).getList();
+                for (Recipe recipe : recipeList) {
+                    Article ar = new Article();
+                    ar.setTitle(recipe.getName());
+                    ar.setUrl(recipe.getDetailurl());
+                    ar.setPicUrl(recipe.getIcon());
+                    ar.setDescription(recipe.getInfo());
+                    articles.add(ar);
+                }
+                
+                responseXML = buildNewsXML(myName, clientName, articles);
+                break;
+            }
+            default:
+                responseXML = buildTextXML(myName, clientName, text);
         }
         
-        LOG.debug( String.format("Message: %s, Reply: %s", message, replyStr) );
-        return replyStr;
+        return responseXML;
     }
 }
 

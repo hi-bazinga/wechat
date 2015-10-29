@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.zxczone.wechat.message.parser.XMLConvertor;
@@ -20,6 +21,9 @@ import com.zxczone.wechat.util.MessageUtil;
  */
 @Service
 public class MessageDispatcher {
+    
+    @Autowired
+    CoreMessageService coreService;
     
     private static final Logger LOG = LoggerFactory.getLogger(MessageDispatcher.class);
     
@@ -39,7 +43,7 @@ public class MessageDispatcher {
                     String eventType = messageMap.get(MessageUtil.TAG_EVENT);  
     
                     if (eventType.equals(MessageUtil.EVENT_TYPE_SUBSCRIBE)) {
-                        responseXML = CoreMessageService.processSubScribeReply(messageMap);
+                        responseXML = coreService.processSubScribeReply(messageMap);
                         LOG.info(String.format("User %s has subscribed!", messageMap.get(MessageUtil.TAG_FROM_USER_NAME)));
                     } else if (eventType.equals(MessageUtil.EVENT_TYPE_UNSUBSCRIBE)) {  
                         LOG.info(String.format("User %s has unsubscribed!", messageMap.get(MessageUtil.TAG_FROM_USER_NAME)));
@@ -51,31 +55,31 @@ public class MessageDispatcher {
                 
                 /* Voice Message */
                 case MessageUtil.REQ_MSG_TYPE_VOICE: {
-                    responseXML = CoreMessageService.processVoiceMsg(messageMap);
+                    responseXML = coreService.processVoiceMsg(messageMap);
                     break;
                 }
                     
                 /* Text Message */
                 case MessageUtil.REQ_MSG_TYPE_TEXT: {
-                    responseXML = CoreMessageService.processTextMsg(messageMap);
+                    responseXML = coreService.processTextMsg(messageMap);
                     break;
                 }
                 
                 /* Link Message */
                 case MessageUtil.REQ_MSG_TYPE_LINK: {
-                    responseXML = CoreMessageService.processLinkMsg(messageMap);
+                    responseXML = coreService.processLinkMsg(messageMap);
                     break;
                 }
                 
                 /* Location Message */
                 case MessageUtil.REQ_MSG_TYPE_LOCATION: {
-                    responseXML = CoreMessageService.processLocationMsg(messageMap);
+                    responseXML = coreService.processLocationMsg(messageMap);
                     break;
                 }
                 
                 /* Image Message */
                 case MessageUtil.REQ_MSG_TYPE_IMAGE: {
-                    responseXML = CoreMessageService.processImageMsg(messageMap);
+                    responseXML = coreService.processImageMsg(messageMap);
                     break;
                 }
             }

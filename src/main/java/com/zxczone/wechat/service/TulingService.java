@@ -34,15 +34,21 @@ public class TulingService {
     
     private static final String API_URL_TEMPLATE = "http://www.tuling123.com/openapi/api?key=%s&info=%s&userid=%s";
     
-    private static final String TEXT = "100000";
-    private static final String LINK = "200000";
-    private static final String NEWS = "302000";
-    private static final String TRAIN = "305000";
-    private static final String FLIGHT = "306000";
-    private static final String RECIPE = "308000";
+    public static final String TEXT = "100000";
+    public static final String LINK = "200000";
+    public static final String NEWS = "302000";
+    public static final String TRAIN = "305000";
+    public static final String FLIGHT = "306000";
+    public static final String RECIPE = "308000";
     
     private static final ObjectMapper mapper = new ObjectMapper();
     
+    /**
+     * Get response from Tuling API.
+     * @param message
+     * @param userId
+     * @return response, never be null.
+     */
     public BaseResponse getResponse(String message, String userId){
         String url = String.format(API_URL_TEMPLATE, Config.TULING_API_KEY, message, userId);
         LOG.debug("Get response from tuling API: " + url);
@@ -59,6 +65,9 @@ public class TulingService {
             
         } catch (IOException e) {
             LOG.error(e.getMessage(), e);
+            response = new BaseResponse();
+            response.setCode("000000");
+            response.setText("你在说什么，我听不懂呀～");
         }
         
         return response;

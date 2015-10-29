@@ -19,6 +19,8 @@ import com.thoughtworks.xstream.core.util.QuickWriter;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
 import com.thoughtworks.xstream.io.xml.XppDriver;
+import com.zxczone.wechat.pojo.response.Article;
+import com.zxczone.wechat.pojo.response.ResNewsMessage;
 import com.zxczone.wechat.pojo.response.ResTextMessage;
 
 /**
@@ -27,6 +29,26 @@ import com.zxczone.wechat.pojo.response.ResTextMessage;
  * @author Jason Zhao
  */
 public class XMLConvertor {
+    
+    private static XStream stream = new XStream(new XppDriver(){
+        public HierarchicalStreamWriter createWriter(Writer out) {  
+            return new PrettyPrintWriter(out) {  
+                boolean cdata = true;  
+      
+                public void startNode(String name, @SuppressWarnings("rawtypes") Class clazz) {  
+                    super.startNode(name, clazz);  
+                }  
+      
+                protected void writeText(QuickWriter writer, String text) {  
+                    if (cdata) {  
+                        writer.write("<![CDATA[" + text + "]]>");  
+                    } else {  
+                        writer.write(text);  
+                    }  
+                }  
+            };
+        }
+    });
 
     public static Map<String, String> parseXMLFromRequest(HttpServletRequest request) throws IOException, DocumentException{
         
@@ -55,28 +77,19 @@ public class XMLConvertor {
      * @return
      */
     public static String textMsgToXML(ResTextMessage message) {
-        XStream stream = new XStream(new XppDriver(){
-            public HierarchicalStreamWriter createWriter(Writer out) {  
-                return new PrettyPrintWriter(out) {  
-                    boolean cdata = true;  
-          
-                    public void startNode(String name, @SuppressWarnings("rawtypes") Class clazz) {  
-                        super.startNode(name, clazz);  
-                    }  
-          
-                    protected void writeText(QuickWriter writer, String text) {  
-                        if (cdata) {  
-                            writer.write("<![CDATA[" + text + "]]>");  
-                        } else {  
-                            writer.write(text);  
-                        }  
-                    }  
-                };
-            }
-        });
-        
         stream.alias("xml", ResTextMessage.class);
         return stream.toXML(message);
     }
     
+    /**
+     * Convert news message object to XML format
+     * @param message
+     * @return
+     */
+    public static String newsMsgToXML(ResNewsMessage newsMsg) {
+        stream.alias("xml", ResNewsMessage.class);  
+        stream.alias("item", Article.class);  
+        return stream.toXML(newsMsg);  
+    }
+   
 }
