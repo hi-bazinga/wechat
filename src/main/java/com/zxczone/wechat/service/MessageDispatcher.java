@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.zxczone.wechat.message.parser.XMLConvertor;
-import com.zxczone.wechat.util.MessageUtil;
+import com.zxczone.wechat.util.Constant;
 
 /**
  * Service for dispatch request
@@ -34,51 +34,51 @@ public class MessageDispatcher {
             Map<String, String> messageMap = XMLConvertor.parseXMLFromRequest(request);
             LOG.debug("Request message map: " + messageMap.toString());
             
-            String msgType = messageMap.get(MessageUtil.TAG_MSG_TYPE);
+            String msgType = messageMap.get(Constant.TAG_MSG_TYPE);
             LOG.debug("Message Type: " + msgType);
             
             switch (msgType) {
                 /* Event Message */
-                case MessageUtil.REQ_MSG_TYPE_EVENT: {
-                    String eventType = messageMap.get(MessageUtil.TAG_EVENT);  
+                case Constant.REQ_MSG_TYPE_EVENT: {
+                    String eventType = messageMap.get(Constant.TAG_EVENT);  
     
-                    if (eventType.equals(MessageUtil.EVENT_TYPE_SUBSCRIBE)) {
+                    if (eventType.equals(Constant.EVENT_TYPE_SUBSCRIBE)) {
                         responseXML = coreService.processSubScribeReply(messageMap);
-                        LOG.info(String.format("User %s has subscribed!", messageMap.get(MessageUtil.TAG_FROM_USER_NAME)));
-                    } else if (eventType.equals(MessageUtil.EVENT_TYPE_UNSUBSCRIBE)) {  
-                        LOG.info(String.format("User %s has unsubscribed!", messageMap.get(MessageUtil.TAG_FROM_USER_NAME)));
-                    } else if (eventType.equals(MessageUtil.EVENT_TYPE_CLICK)) {  
+                        LOG.info(String.format("User %s has subscribed!", messageMap.get(Constant.TAG_FROM_USER_NAME)));
+                    } else if (eventType.equals(Constant.EVENT_TYPE_UNSUBSCRIBE)) {  
+                        LOG.info(String.format("User %s has unsubscribed!", messageMap.get(Constant.TAG_FROM_USER_NAME)));
+                    } else if (eventType.equals(Constant.EVENT_TYPE_CLICK)) {  
                         //TODO
                     }
                     break;
                 }
                 
                 /* Voice Message */
-                case MessageUtil.REQ_MSG_TYPE_VOICE: {
+                case Constant.REQ_MSG_TYPE_VOICE: {
                     responseXML = coreService.processVoiceMsg(messageMap);
                     break;
                 }
                     
                 /* Text Message */
-                case MessageUtil.REQ_MSG_TYPE_TEXT: {
+                case Constant.REQ_MSG_TYPE_TEXT: {
                     responseXML = coreService.processTextMsg(messageMap);
                     break;
                 }
                 
                 /* Link Message */
-                case MessageUtil.REQ_MSG_TYPE_LINK: {
+                case Constant.REQ_MSG_TYPE_LINK: {
                     responseXML = coreService.processLinkMsg(messageMap);
                     break;
                 }
                 
                 /* Location Message */
-                case MessageUtil.REQ_MSG_TYPE_LOCATION: {
+                case Constant.REQ_MSG_TYPE_LOCATION: {
                     responseXML = coreService.processLocationMsg(messageMap);
                     break;
                 }
                 
                 /* Image Message */
-                case MessageUtil.REQ_MSG_TYPE_IMAGE: {
+                case Constant.REQ_MSG_TYPE_IMAGE: {
                     responseXML = coreService.processImageMsg(messageMap);
                     break;
                 }

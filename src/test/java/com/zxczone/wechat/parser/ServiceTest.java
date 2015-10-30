@@ -7,16 +7,23 @@ import com.zxczone.wechat.service.CoreMessageService;
 import com.zxczone.wechat.service.MenuService;
 import com.zxczone.wechat.service.TokenService;
 import com.zxczone.wechat.service.TulingService;
+import com.zxczone.wechat.tuling.pojo.BaseResponse;
 import com.zxczone.wechat.util.FaceUtil;
 import com.zxczone.wechat.util.SpringBasedTest;
 
-public class TestUtilMethod extends SpringBasedTest{
+public class ServiceTest extends SpringBasedTest{
 
     @Autowired
     TulingService tulingService;
     
     @Autowired
     CoreMessageService coreService;
+    
+    @Autowired
+    TokenService tokenService;
+    
+    @Autowired
+    MenuService menuService;
     
     @Test
     public void testFace(){
@@ -31,17 +38,23 @@ public class TestUtilMethod extends SpringBasedTest{
     
     @Test
     public void testGetToken(){
-        TokenService.getAccessToken();
+        tokenService.getAccessToken();
     }
     
     @Test
     public void testCreateMenu(){
-        MenuService.createMenu();
+        menuService.createMenu();
     }
     
     @Test
     public void testGetResponseXML(){
         coreService.getResponseXMLFromRobot("Jason", "Client", "鱼香肉丝怎么做");
+    }
+    
+    @Test
+    public void testTuling(){
+        BaseResponse response = tulingService.getResponse("菜谱", "qsdasd");
+        System.out.println(response.getCode());
     }
 
 }

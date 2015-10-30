@@ -1,43 +1,20 @@
 package com.zxczone.wechat.pojo;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.Data;
+
 /**
  *
  * @author Jason Zhao
  */
+@Data
 public class CoordConvResult {
 
-    /**
-     * longitude
-     */
-    private String x;
+    @JsonProperty("x")
+    private String longitude;
     
-    /**
-     * latitude
-     */
-    private String y;
-
-    /**
-     * Get longitude
-     * @return
-     */
-    public String getX() {
-        return x;
-    }
-
-    public void setX(String x) {
-        this.x = x;
-    }
-
-    /**
-     * Get latitude
-     * @return
-     */
-    public String getY() {
-        return y;
-    }
-
-    public void setY(String y) {
-        this.y = y;
-    }
+    @JsonProperty("y")
+    private String latitude;
     
 }

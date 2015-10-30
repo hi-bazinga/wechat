@@ -18,6 +18,7 @@ import com.zxczone.wechat.tuling.pojo.News;
 import com.zxczone.wechat.tuling.pojo.Recipe;
 import com.zxczone.wechat.tuling.pojo.TrainInfo;
 import com.zxczone.wechat.util.Config;
+import com.zxczone.wechat.util.Constant;
 
 /**
  * This class provide methods for Tuling API.
@@ -67,7 +68,7 @@ public class TulingService {
             LOG.error(e.getMessage(), e);
             response = new BaseResponse();
             response.setCode("000000");
-            response.setText("你在说什么，我听不懂呀～");
+            response.setText(Constant.ROBOT_ERROR_MSG);
         }
         
         return response;

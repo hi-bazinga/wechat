@@ -26,7 +26,7 @@ import com.zxczone.wechat.tuling.pojo.ListResponse;
 import com.zxczone.wechat.tuling.pojo.Recipe;
 import com.zxczone.wechat.util.Config;
 import com.zxczone.wechat.util.FaceUtil;
-import com.zxczone.wechat.util.MessageUtil;
+import com.zxczone.wechat.util.Constant;
 
 /**
  * Service for processing request message
@@ -37,10 +37,12 @@ import com.zxczone.wechat.util.MessageUtil;
 public class CoreMessageService {
     
     @Autowired
+    RestTemplate restTmpl;
+    
+    @Autowired
     TulingService tulingService;
 
     private static final Logger LOG = LoggerFactory.getLogger(CoreMessageService.class);
-    private static final RestTemplate restTmpl = new RestTemplate();
    
     /**
      * Process text request, get response message in XML
@@ -48,9 +50,9 @@ public class CoreMessageService {
      * @return
      */
     public String processTextMsg(Map<String, String> messageMap) {
-        String clientName = messageMap.get(MessageUtil.TAG_FROM_USER_NAME);
-        String myName = messageMap.get(MessageUtil.TAG_TO_USER_NAME);
-        String content = messageMap.get(MessageUtil.TAG_CONTENT);
+        String clientName = messageMap.get(Constant.TAG_FROM_USER_NAME);
+        String myName = messageMap.get(Constant.TAG_TO_USER_NAME);
+        String content = messageMap.get(Constant.TAG_CONTENT);
         
         /* Handle wechat face content */
         if (FaceUtil.isFaceText(content)) {
@@ -66,11 +68,11 @@ public class CoreMessageService {
      * @return
      */
     public String processVoiceMsg(Map<String, String> messageMap) {
-        String clientName = messageMap.get(MessageUtil.TAG_FROM_USER_NAME);
-        String myName = messageMap.get(MessageUtil.TAG_TO_USER_NAME);
-        String recognition = messageMap.get(MessageUtil.TAG_RECOGNITION);
+        String clientName = messageMap.get(Constant.TAG_FROM_USER_NAME);
+        String myName = messageMap.get(Constant.TAG_TO_USER_NAME);
+        String recognition = messageMap.get(Constant.TAG_RECOGNITION);
         
-        return recognition == null ? MessageUtil.VOICE_RECOG_NOT_OPEN_MSG
+        return recognition == null ? Constant.VOICE_RECOG_NOT_OPEN_MSG
                 : getResponseXMLFromRobot(myName, clientName, recognition);
     }
     
@@ -90,15 +92,15 @@ public class CoreMessageService {
      * @return
      */
     public String processLocationMsg(Map<String, String> messageMap) {
-        String clientName = messageMap.get(MessageUtil.TAG_FROM_USER_NAME);
-        String myName = messageMap.get(MessageUtil.TAG_TO_USER_NAME);
-        String locX = messageMap.get(MessageUtil.TAG_LOCATION_X);
-        String locY = messageMap.get(MessageUtil.TAG_LOCATION_Y);
+        String clientName = messageMap.get(Constant.TAG_FROM_USER_NAME);
+        String myName = messageMap.get(Constant.TAG_TO_USER_NAME);
+        String locX = messageMap.get(Constant.TAG_LOCATION_X);
+        String locY = messageMap.get(Constant.TAG_LOCATION_Y);
         
         LocationInfo locInfo = getLocInfoByCoord(locX, locY);
         String replyText = locInfo != null ? String.format("哈哈,我认识这个地方,%s,%s",
                 locInfo.getFormatted_address(),
-                locInfo.getSematic_description()) : MessageUtil.MAP_ERROR_MSG;
+                locInfo.getSematic_description()) : Constant.MAP_ERROR_MSG;
 
         return buildTextXML(myName, clientName, replyText);
     }
@@ -119,8 +121,8 @@ public class CoreMessageService {
      * @return
      */
     public String processSubScribeReply(Map<String, String> messageMap){
-        String clientName = messageMap.get(MessageUtil.TAG_FROM_USER_NAME);
-        String myName = messageMap.get(MessageUtil.TAG_TO_USER_NAME);
+        String clientName = messageMap.get(Constant.TAG_FROM_USER_NAME);
+        String myName = messageMap.get(Constant.TAG_TO_USER_NAME);
         
         return buildTextXML(myName, clientName, "熊孩子，怎么现在才关注我！");
     }
@@ -137,7 +139,7 @@ public class CoreMessageService {
         resMsg.setFromUserName(senderName);
         resMsg.setToUserName(receiverName);
         resMsg.setCreateTime(new Date().getTime());
-        resMsg.setMsgType(MessageUtil.RES_MSG_TYPE_TEXT);
+        resMsg.setMsgType(Constant.RES_MSG_TYPE_TEXT);
         resMsg.setContent(message);
             
         return XMLConvertor.textMsgToXML(resMsg);
@@ -156,7 +158,7 @@ public class CoreMessageService {
         newsMsg.setFromUserName(senderName);
         newsMsg.setToUserName(receiverName);
         newsMsg.setCreateTime(new Date().getTime());
-        newsMsg.setMsgType(MessageUtil.RES_MSG_TYPE_NEWS);
+        newsMsg.setMsgType(Constant.RES_MSG_TYPE_NEWS);
         
         /* Don't use subList, otherwise XStream will generate malformed XML */
         int limit = 5;
@@ -198,7 +200,7 @@ public class CoreMessageService {
         
             /* Get location information by baidu coordinate */
             String locationURL = String.format("http://api.map.baidu.com/geocoder/v2/?ak=%s&location=%s,%s&output=json",
-                    Config.BAIDU_MAP_API_KEY, convResult.getY(), convResult.getX());
+                    Config.BAIDU_MAP_API_KEY, convResult.getLatitude(), convResult.getLongitude());
             LOG.debug("Get location info URL: " + locationURL);
         
             String resJson = restTmpl.getForObject(locationURL, String.class);

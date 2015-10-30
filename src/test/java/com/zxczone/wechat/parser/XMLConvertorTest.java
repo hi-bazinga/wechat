@@ -8,14 +8,13 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.zxczone.wechat.message.parser.XMLConvertor;
 import com.zxczone.wechat.pojo.response.ResTextMessage;
-import com.zxczone.wechat.util.MessageUtil;
+import com.zxczone.wechat.util.Constant;
 
 /**
- * TODO
  *
  * @author Jason Zhao
  */
-public class TestXMLParser {
+public class XMLConvertorTest {
 
     @Test
     public void testParse(){
@@ -23,7 +22,7 @@ public class TestXMLParser {
         textMsg.setContent("123");
         textMsg.setFromUserName("Jason");
         textMsg.setToUserName("Chloe");
-        textMsg.setMsgType(MessageUtil.RES_MSG_TYPE_TEXT);
+        textMsg.setMsgType(Constant.RES_MSG_TYPE_TEXT);
         
         String xml = XMLConvertor.textMsgToXML(textMsg);
         System.out.println(xml);

@@ -5,7 +5,7 @@ package com.zxczone.wechat.util;
  *
  * @author Jason Zhao
  */
-public class MessageUtil {
+public class Constant {
    
     /* Message Type */
     public static final String REQ_MSG_TYPE_TEXT = "text";

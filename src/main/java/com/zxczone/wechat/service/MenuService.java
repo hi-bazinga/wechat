@@ -2,19 +2,27 @@ package com.zxczone.wechat.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 /**
  *
  * @author Jason Zhao
  */
+@Service
 public class MenuService {
     
+    @Autowired
+    RestTemplate restTmpl;
+    
+    @Autowired
+    TokenService tokenService;
+    
     private static final Logger LOG = LoggerFactory.getLogger(CoreMessageService.class);
-    private static RestTemplate restTmpl = new RestTemplate();
 
     private static String menuJson = 
             " { " +
@@ -50,8 +58,8 @@ public class MenuService {
     /**
      * Not supported for personal account
      */
-    public static void createMenu(){
-        String menuURL = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=" + TokenService.getAccessToken();
+    public void createMenu(){
+        String menuURL = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=" + tokenService.getAccessToken();
         
         ResponseEntity<String> response = restTmpl.exchange(menuURL,
                 HttpMethod.POST, new HttpEntity<>(menuJson), String.class);
