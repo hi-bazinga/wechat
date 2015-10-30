@@ -1,4 +1,4 @@
-package com.zxczone.wechat.tuling.pojo;
+package com.zxczone.wechat.pojo.tuling;
 
 import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

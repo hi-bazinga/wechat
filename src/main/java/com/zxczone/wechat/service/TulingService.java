@@ -10,13 +10,13 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zxczone.wechat.tuling.pojo.BaseResponse;
-import com.zxczone.wechat.tuling.pojo.FlightInfo;
-import com.zxczone.wechat.tuling.pojo.LinkResponse;
-import com.zxczone.wechat.tuling.pojo.ListResponse;
-import com.zxczone.wechat.tuling.pojo.News;
-import com.zxczone.wechat.tuling.pojo.Recipe;
-import com.zxczone.wechat.tuling.pojo.TrainInfo;
+import com.zxczone.wechat.pojo.tuling.BaseResponse;
+import com.zxczone.wechat.pojo.tuling.FlightInfo;
+import com.zxczone.wechat.pojo.tuling.LinkResponse;
+import com.zxczone.wechat.pojo.tuling.ListResponse;
+import com.zxczone.wechat.pojo.tuling.News;
+import com.zxczone.wechat.pojo.tuling.Recipe;
+import com.zxczone.wechat.pojo.tuling.TrainInfo;
 import com.zxczone.wechat.util.Config;
 import com.zxczone.wechat.util.Constant;
 

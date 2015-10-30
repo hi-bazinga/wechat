@@ -3,11 +3,11 @@ package com.zxczone.wechat.parser;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.zxczone.wechat.pojo.tuling.BaseResponse;
 import com.zxczone.wechat.service.CoreMessageService;
 import com.zxczone.wechat.service.MenuService;
 import com.zxczone.wechat.service.TokenService;
 import com.zxczone.wechat.service.TulingService;
-import com.zxczone.wechat.tuling.pojo.BaseResponse;
 import com.zxczone.wechat.util.FaceUtil;
 import com.zxczone.wechat.util.SpringBasedTest;
 
@@ -48,7 +48,7 @@ public class ServiceTest extends SpringBasedTest{
     
     @Test
     public void testGetResponseXML(){
-        coreService.getResponseXMLFromRobot("Jason", "Client", "鱼香肉丝怎么做");
+        coreService.getResponseXMLFromTuling("Jason", "Client", "鱼香肉丝怎么做");
     }
     
     @Test

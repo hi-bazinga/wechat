@@ -14,16 +14,19 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zxczone.wechat.message.parser.XMLConvertor;
-import com.zxczone.wechat.pojo.BaiduResponse;
-import com.zxczone.wechat.pojo.CoordConvResult;
-import com.zxczone.wechat.pojo.LocationInfo;
+import com.zxczone.wechat.pojo.baidumap.BaiduResponse;
+import com.zxczone.wechat.pojo.baidumap.CoordConvResult;
+import com.zxczone.wechat.pojo.baidumap.LocationInfo;
 import com.zxczone.wechat.pojo.response.Article;
 import com.zxczone.wechat.pojo.response.ResNewsMessage;
 import com.zxczone.wechat.pojo.response.ResTextMessage;
-import com.zxczone.wechat.tuling.pojo.BaseResponse;
-import com.zxczone.wechat.tuling.pojo.LinkResponse;
-import com.zxczone.wechat.tuling.pojo.ListResponse;
-import com.zxczone.wechat.tuling.pojo.Recipe;
+import com.zxczone.wechat.pojo.tuling.BaseResponse;
+import com.zxczone.wechat.pojo.tuling.FlightInfo;
+import com.zxczone.wechat.pojo.tuling.LinkResponse;
+import com.zxczone.wechat.pojo.tuling.ListResponse;
+import com.zxczone.wechat.pojo.tuling.News;
+import com.zxczone.wechat.pojo.tuling.Recipe;
+import com.zxczone.wechat.pojo.tuling.TrainInfo;
 import com.zxczone.wechat.util.Config;
 import com.zxczone.wechat.util.FaceUtil;
 import com.zxczone.wechat.util.Constant;
@@ -59,7 +62,7 @@ public class CoreMessageService {
             content = FaceUtil.faceToText(content);
         }
         
-        return getResponseXMLFromRobot(myName, clientName, content);
+        return getResponseXMLFromTuling(myName, clientName, content);
     }
     
     /**
@@ -73,7 +76,7 @@ public class CoreMessageService {
         String recognition = messageMap.get(Constant.TAG_RECOGNITION);
         
         return recognition == null ? Constant.VOICE_RECOG_NOT_OPEN_MSG
-                : getResponseXMLFromRobot(myName, clientName, recognition);
+                : getResponseXMLFromTuling(myName, clientName, recognition);
     }
     
     /**
@@ -224,12 +227,13 @@ public class CoreMessageService {
     }
     
     /**
-     * Get reply text from Robot
+     * Get response from Tuling and return generated XML.
+     * @param myName
+     * @param clientName 
      * @param message
-     * @param userId
      * @return
      */
-    public String getResponseXMLFromRobot(String myName, String clientName, String message) {
+    public String getResponseXMLFromTuling(String myName, String clientName, String message) {
         BaseResponse response = tulingService.getResponse(message, clientName);
         String code = response.getCode();
         String text = response.getText();
@@ -238,7 +242,7 @@ public class CoreMessageService {
         switch(code) {
             case TulingService.LINK: {
                 String url = ((LinkResponse) response).getUrl();
-                String respText = String.format("%s, <a href=\"％s\">%s</a>", text, url, url);
+                String respText = String.format("%s, <a href=\"%s\">%s</a>", text, url, url);
                 responseXML = buildTextXML(myName, clientName, respText);
                 break;
             }
@@ -257,7 +261,55 @@ public class CoreMessageService {
                     ar.setDescription(recipe.getInfo());
                     articles.add(ar);
                 }
+                responseXML = buildNewsXML(myName, clientName, articles);
+                break;
+            }
+            case TulingService.FLIGHT: {
+                List<Article> articles = new ArrayList<Article>();
                 
+                @SuppressWarnings("unchecked")
+                List<FlightInfo> flightList = ((ListResponse<FlightInfo>) response).getList();
+                for (FlightInfo flight : flightList) {
+                    Article ar = new Article();
+                    ar.setTitle(flight.getFlight());
+                    ar.setUrl("");
+                    ar.setPicUrl(flight.getIcon());
+                    ar.setDescription(flight.getStarttime() + " ~ " + flight.getEndtime());
+                    articles.add(ar);
+                }
+                responseXML = buildNewsXML(myName, clientName, articles);
+                break;
+            }
+            case TulingService.TRAIN: {
+                List<Article> articles = new ArrayList<Article>();
+                
+                @SuppressWarnings("unchecked")
+                List<TrainInfo> trainList = ((ListResponse<TrainInfo>) response).getList();
+                for (TrainInfo train : trainList) {
+                    Article ar = new Article();
+                    ar.setTitle(train.getTrainnum());
+                    ar.setUrl(train.getDetailurl());
+                    ar.setPicUrl(train.getIcon());
+                    ar.setDescription(String.format("%s-️%s, %s-%s", train.getStart(), 
+                            train.getTerminal(), train.getStarttime(), train.getEndtime()));
+                    articles.add(ar);
+                }
+                responseXML = buildNewsXML(myName, clientName, articles);
+                break;
+            }
+            case TulingService.NEWS: {
+                List<Article> articles = new ArrayList<Article>();
+                
+                @SuppressWarnings("unchecked")
+                List<News> newsList = ((ListResponse<News>) response).getList();
+                for (News news : newsList) {
+                    Article ar = new Article();
+                    ar.setTitle(news.getArticle());
+                    ar.setUrl(news.getDetailurl());
+                    ar.setPicUrl(news.getIcon());
+                    ar.setDescription(news.getSource());
+                    articles.add(ar);
+                }
                 responseXML = buildNewsXML(myName, clientName, articles);
                 break;
             }

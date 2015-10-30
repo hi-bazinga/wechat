@@ -1,4 +1,4 @@
-package com.zxczone.wechat.pojo;
+package com.zxczone.wechat.pojo.baidumap;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

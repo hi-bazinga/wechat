@@ -1,4 +1,4 @@
-package com.zxczone.wechat.tuling.pojo;
+package com.zxczone.wechat.pojo.tuling;
 
 import java.util.List;
 
