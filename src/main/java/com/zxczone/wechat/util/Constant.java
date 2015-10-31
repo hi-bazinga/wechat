@@ -35,8 +35,11 @@ public class Constant {
     public static final String TAG_LOCATION_Y = "Location_Y";
     
     /* Default Text */
-    public static final String ROBOT_ERROR_MSG = "你在说啥，有点听不懂。。。";
-    public static final String MAP_ERROR_MSG = "我不认识这个地方呀";
+    public static final String TULING_ERROR_MSG = "你在说啥，有点听不懂。。。";
+    public static final String BAIDUMAP_ERROR_MSG = "我不认识这个地方呀";
     public static final String VOICE_RECOG_NOT_OPEN_MSG = "未开通语音识别功能";
+    
+    public static final String TRAIN_MSG_BANNER = "已帮您找到以下车次:";
+    public static final String QUNAR_ROOT_URL = "http://touch.qunar.com/h5/train";
     
 }

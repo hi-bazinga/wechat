@@ -68,7 +68,7 @@ public class TulingService {
             LOG.error(e.getMessage(), e);
             response = new BaseResponse();
             response.setCode("000000");
-            response.setText(Constant.ROBOT_ERROR_MSG);
+            response.setText(Constant.TULING_ERROR_MSG);
         }
         
         return response;

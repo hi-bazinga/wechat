@@ -1,4 +1,4 @@
-package com.zxczone.wechat.message.parser;
+package com.zxczone.wechat.helper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,11 +24,11 @@ import com.zxczone.wechat.pojo.response.ResNewsMessage;
 import com.zxczone.wechat.pojo.response.ResTextMessage;
 
 /**
- * XML processor
+ * XML converter
  *
  * @author Jason Zhao
  */
-public class XMLConvertor {
+public class XMLConverter {
     
     private static XStream stream = new XStream(new XppDriver(){
         public HierarchicalStreamWriter createWriter(Writer out) {  
@@ -50,6 +50,13 @@ public class XMLConvertor {
         }
     });
 
+    /**
+     * Read XML data from request
+     * @param request
+     * @return
+     * @throws IOException
+     * @throws DocumentException
+     */
     public static Map<String, String> parseXMLFromRequest(HttpServletRequest request) throws IOException, DocumentException{
         
         InputStream inputStream = request.getInputStream();  

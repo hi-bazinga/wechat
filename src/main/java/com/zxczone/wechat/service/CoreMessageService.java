@@ -1,7 +1,6 @@
 package com.zxczone.wechat.service;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -13,13 +12,11 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zxczone.wechat.message.parser.XMLConvertor;
+import com.zxczone.wechat.helper.ResponseXMLBuilder;
 import com.zxczone.wechat.pojo.baidumap.BaiduResponse;
 import com.zxczone.wechat.pojo.baidumap.CoordConvResult;
 import com.zxczone.wechat.pojo.baidumap.LocationInfo;
 import com.zxczone.wechat.pojo.response.Article;
-import com.zxczone.wechat.pojo.response.ResNewsMessage;
-import com.zxczone.wechat.pojo.response.ResTextMessage;
 import com.zxczone.wechat.pojo.tuling.BaseResponse;
 import com.zxczone.wechat.pojo.tuling.FlightInfo;
 import com.zxczone.wechat.pojo.tuling.LinkResponse;
@@ -28,8 +25,9 @@ import com.zxczone.wechat.pojo.tuling.News;
 import com.zxczone.wechat.pojo.tuling.Recipe;
 import com.zxczone.wechat.pojo.tuling.TrainInfo;
 import com.zxczone.wechat.util.Config;
-import com.zxczone.wechat.util.FaceUtil;
 import com.zxczone.wechat.util.Constant;
+import com.zxczone.wechat.util.FaceUtil;
+import com.zxczone.wechat.util.StringUtil;
 
 /**
  * Service for processing request message
@@ -44,6 +42,9 @@ public class CoreMessageService {
     
     @Autowired
     TulingService tulingService;
+    
+    @Autowired
+    ResponseXMLBuilder respXmlBuilder;
 
     private static final Logger LOG = LoggerFactory.getLogger(CoreMessageService.class);
    
@@ -103,9 +104,9 @@ public class CoreMessageService {
         LocationInfo locInfo = getLocInfoByCoord(locX, locY);
         String replyText = locInfo != null ? String.format("哈哈,我认识这个地方,%s,%s",
                 locInfo.getFormatted_address(),
-                locInfo.getSematic_description()) : Constant.MAP_ERROR_MSG;
+                locInfo.getSematic_description()) : Constant.BAIDUMAP_ERROR_MSG;
 
-        return buildTextXML(myName, clientName, replyText);
+        return respXmlBuilder.buildTextXML(myName, clientName, replyText);
     }
     
     /**
@@ -127,56 +128,7 @@ public class CoreMessageService {
         String clientName = messageMap.get(Constant.TAG_FROM_USER_NAME);
         String myName = messageMap.get(Constant.TAG_TO_USER_NAME);
         
-        return buildTextXML(myName, clientName, "熊孩子，怎么现在才关注我！");
-    }
-    
-    /**
-     * Build XML for text response
-     * @param senderName sender ID
-     * @param receiverName receiver ID
-     * @param message message content
-     * @return
-     */
-    public String buildTextXML(String senderName, String receiverName, String message){
-        ResTextMessage resMsg = new ResTextMessage();
-        resMsg.setFromUserName(senderName);
-        resMsg.setToUserName(receiverName);
-        resMsg.setCreateTime(new Date().getTime());
-        resMsg.setMsgType(Constant.RES_MSG_TYPE_TEXT);
-        resMsg.setContent(message);
-            
-        return XMLConvertor.textMsgToXML(resMsg);
-    }
-    
-    /**
-     * Build XML for picture-text response
-     * @param senderName sender ID
-     * @param receiverName receiver ID
-     * @param  message content
-     * @param articles article list
-     * @return
-     */
-    public String buildNewsXML(String senderName, String receiverName, List<Article> articles){
-        ResNewsMessage newsMsg = new ResNewsMessage();
-        newsMsg.setFromUserName(senderName);
-        newsMsg.setToUserName(receiverName);
-        newsMsg.setCreateTime(new Date().getTime());
-        newsMsg.setMsgType(Constant.RES_MSG_TYPE_NEWS);
-        
-        /* Don't use subList, otherwise XStream will generate malformed XML */
-        int limit = 5;
-        if (articles.size() > limit) {
-            newsMsg.setArticleCount(limit);
-            
-            List<Article> truncList = new ArrayList<Article>();
-            truncList.addAll(articles.subList(0, limit));
-            newsMsg.setArticles(truncList);
-        } else {
-            newsMsg.setArticleCount(articles.size());
-            newsMsg.setArticles(articles);
-        }
-            
-        return XMLConvertor.newsMsgToXML(newsMsg);
+        return respXmlBuilder.buildTextXML(myName, clientName, "熊孩子，怎么现在才关注我！");
     }
     
     /**
@@ -243,7 +195,7 @@ public class CoreMessageService {
             case TulingService.LINK: {
                 String url = ((LinkResponse) response).getUrl();
                 String respText = String.format("%s, <a href=\"%s\">%s</a>", text, url, url);
-                responseXML = buildTextXML(myName, clientName, respText);
+                responseXML = respXmlBuilder.buildTextXML(myName, clientName, respText);
                 break;
             }
             case TulingService.RECIPE: {
@@ -261,7 +213,7 @@ public class CoreMessageService {
                     ar.setDescription(recipe.getInfo());
                     articles.add(ar);
                 }
-                responseXML = buildNewsXML(myName, clientName, articles);
+                responseXML = respXmlBuilder.buildNewsXML(myName, clientName, articles);
                 break;
             }
             case TulingService.FLIGHT: {
@@ -277,24 +229,35 @@ public class CoreMessageService {
                     ar.setDescription(flight.getStarttime() + " ~ " + flight.getEndtime());
                     articles.add(ar);
                 }
-                responseXML = buildNewsXML(myName, clientName, articles);
+                responseXML = respXmlBuilder.buildNewsXML(myName, clientName, articles);
                 break;
             }
             case TulingService.TRAIN: {
                 List<Article> articles = new ArrayList<Article>();
+                Article banner = new Article();
+				banner.setTitle(Constant.TRAIN_MSG_BANNER);
+				banner.setUrl(Constant.QUNAR_ROOT_URL);
+				banner.setPicUrl("http://source.qunarzz.com/common/hf/logo.png");
+				banner.setDescription("");
+				articles.add(banner);
                 
                 @SuppressWarnings("unchecked")
                 List<TrainInfo> trainList = ((ListResponse<TrainInfo>) response).getList();
-                for (TrainInfo train : trainList) {
-                    Article ar = new Article();
-                    ar.setTitle(train.getTrainnum());
-                    ar.setUrl(train.getDetailurl());
-                    ar.setPicUrl(train.getIcon());
-                    ar.setDescription(String.format("%s-️%s, %s-%s", train.getStart(), 
-                            train.getTerminal(), train.getStarttime(), train.getEndtime()));
-                    articles.add(ar);
-                }
-                responseXML = buildNewsXML(myName, clientName, articles);
+				for (TrainInfo train : trainList) {
+					String titile = String.format("%s\n%s-️%s, %s-%s", train.getTrainnum(), train.getStart(),
+							train.getTerminal(), train.getStarttime(), train.getEndtime());
+					String picUrl = String.format("%s/trainDetail?trainNum=%s&startStation=%s&endStation=%s",
+							Constant.QUNAR_ROOT_URL, StringUtil.getTrainNum(train.getTrainnum()), train.getStart(),
+							train.getTerminal());
+					
+					Article ar = new Article();
+					ar.setTitle(titile);
+					ar.setUrl(picUrl);
+					ar.setPicUrl(train.getIcon());
+					ar.setDescription("");
+					articles.add(ar);
+				}
+                responseXML = respXmlBuilder.buildNewsXML(myName, clientName, articles);
                 break;
             }
             case TulingService.NEWS: {
@@ -310,11 +273,11 @@ public class CoreMessageService {
                     ar.setDescription(news.getSource());
                     articles.add(ar);
                 }
-                responseXML = buildNewsXML(myName, clientName, articles);
+                responseXML = respXmlBuilder.buildNewsXML(myName, clientName, articles);
                 break;
             }
             default:
-                responseXML = buildTextXML(myName, clientName, text);
+                responseXML = respXmlBuilder.buildTextXML(myName, clientName, text);
         }
         
         return responseXML;

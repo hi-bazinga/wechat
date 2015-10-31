@@ -1,14 +1,11 @@
 package com.zxczone.wechat.parser;
 
-import java.io.IOException;
-
 import org.junit.Test;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.zxczone.wechat.message.parser.XMLConvertor;
+import com.zxczone.wechat.helper.XMLConverter;
 import com.zxczone.wechat.pojo.response.ResTextMessage;
 import com.zxczone.wechat.util.Constant;
+import com.zxczone.wechat.util.StringUtil;
 
 /**
  *
@@ -24,11 +21,14 @@ public class XMLConvertorTest {
         textMsg.setToUserName("Chloe");
         textMsg.setMsgType(Constant.RES_MSG_TYPE_TEXT);
         
-        String xml = XMLConvertor.textMsgToXML(textMsg);
+        String xml = XMLConverter.textMsgToXML(textMsg);
         System.out.println(xml);
     }
     
     @Test
-    public void testRobot() throws JsonParseException, JsonMappingException, IOException{
+    public void testTrainNum(){
+    	String str = "Z21(直达特快)";
+    	String result = StringUtil.getTrainNum(str);
+    	System.out.println(result);
     }
 }
