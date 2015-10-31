@@ -40,7 +40,7 @@ public class ResponseXMLBuilder {
      * @param articles article list
      * @return
      */
-    public String buildNewsXML(String senderName, String receiverName, List<Article> articles){
+    public String buildNewsXML(String senderName, String receiverName, List<Article> articles, boolean truncate){
         ResNewsMessage newsMsg = new ResNewsMessage();
         newsMsg.setFromUserName(senderName);
         newsMsg.setToUserName(receiverName);
@@ -49,7 +49,7 @@ public class ResponseXMLBuilder {
         
         /* Don't use subList, otherwise XStream will generate malformed XML */
         int limit = 5;
-        if (articles.size() > limit) {
+        if (truncate && articles.size() > limit) {
             newsMsg.setArticleCount(limit);
             
             List<Article> truncList = new ArrayList<Article>();

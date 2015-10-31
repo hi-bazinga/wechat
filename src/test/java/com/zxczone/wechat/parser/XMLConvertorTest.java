@@ -27,7 +27,8 @@ public class XMLConvertorTest {
     
     @Test
     public void testTrainNum(){
-    	String str = "Z21(直达特快)";
+    	//String str = "Z21(直达特快)";
+    	String str = "K75/K78(快速)";
     	String result = StringUtil.getTrainNum(str);
     	System.out.println(result);
     }

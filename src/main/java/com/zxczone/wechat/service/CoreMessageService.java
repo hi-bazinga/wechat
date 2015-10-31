@@ -213,7 +213,7 @@ public class CoreMessageService {
                     ar.setDescription(recipe.getInfo());
                     articles.add(ar);
                 }
-                responseXML = respXmlBuilder.buildNewsXML(myName, clientName, articles);
+                responseXML = respXmlBuilder.buildNewsXML(myName, clientName, articles, true);
                 break;
             }
             case TulingService.FLIGHT: {
@@ -229,35 +229,50 @@ public class CoreMessageService {
                     ar.setDescription(flight.getStarttime() + " ~ " + flight.getEndtime());
                     articles.add(ar);
                 }
-                responseXML = respXmlBuilder.buildNewsXML(myName, clientName, articles);
+                responseXML = respXmlBuilder.buildNewsXML(myName, clientName, articles, true);
                 break;
             }
             case TulingService.TRAIN: {
-                List<Article> articles = new ArrayList<Article>();
-                Article banner = new Article();
-				banner.setTitle(Constant.TRAIN_MSG_BANNER);
-				banner.setUrl(Constant.QUNAR_ROOT_URL);
-				banner.setPicUrl("http://source.qunarzz.com/common/hf/logo.png");
-				banner.setDescription("");
-				articles.add(banner);
-                
                 @SuppressWarnings("unchecked")
                 List<TrainInfo> trainList = ((ListResponse<TrainInfo>) response).getList();
+            	
+                List<Article> articles = new ArrayList<Article>();
 				for (TrainInfo train : trainList) {
-					String titile = String.format("%s\n%s-️%s, %s-%s", train.getTrainnum(), train.getStart(),
-							train.getTerminal(), train.getStarttime(), train.getEndtime());
-					String picUrl = String.format("%s/trainDetail?trainNum=%s&startStation=%s&endStation=%s",
+					if (articles.size() > 4)
+						break;
+					
+					String titile = String.format("%s\n%s-%s\n%s-%s", train.getTrainnum(),
+							train.getStarttime(), train.getEndtime(), train.getStart(), train.getTerminal());
+					String detailUrl = String.format("%s/trainDetail?trainNum=%s&startStation=%s&endStation=%s",
 							Constant.QUNAR_ROOT_URL, StringUtil.getTrainNum(train.getTrainnum()), train.getStart(),
 							train.getTerminal());
 					
 					Article ar = new Article();
 					ar.setTitle(titile);
-					ar.setUrl(picUrl);
+					ar.setUrl(detailUrl);
 					ar.setPicUrl(train.getIcon());
 					ar.setDescription("");
 					articles.add(ar);
 				}
-                responseXML = respXmlBuilder.buildNewsXML(myName, clientName, articles);
+				
+                Article banner = new Article();
+				banner.setTitle(Constant.TRAIN_MSG_BANNER);
+				banner.setUrl(Constant.QUNAR_ROOT_URL);
+				banner.setPicUrl("");
+				banner.setDescription("");
+				articles.add(0, banner);
+ 
+				String findAllUrl = String.format("%s/trainlist?&startStation=%s&endStation=%s&sort=0",
+						Constant.QUNAR_ROOT_URL, trainList.get(0).getStart(), trainList.get(0).getTerminal());
+				
+				Article bottom = new Article();
+				bottom.setTitle("不全？查看全部 >>>");
+				bottom.setUrl(findAllUrl);
+				bottom.setPicUrl("");
+				bottom.setDescription("");
+				articles.add(bottom);
+				
+                responseXML = respXmlBuilder.buildNewsXML(myName, clientName, articles, false);
                 break;
             }
             case TulingService.NEWS: {
@@ -273,7 +288,7 @@ public class CoreMessageService {
                     ar.setDescription(news.getSource());
                     articles.add(ar);
                 }
-                responseXML = respXmlBuilder.buildNewsXML(myName, clientName, articles);
+                responseXML = respXmlBuilder.buildNewsXML(myName, clientName, articles, true);
                 break;
             }
             default:
