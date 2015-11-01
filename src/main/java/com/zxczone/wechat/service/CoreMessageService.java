@@ -128,7 +128,7 @@ public class CoreMessageService {
         String clientName = messageMap.get(Constant.TAG_FROM_USER_NAME);
         String myName = messageMap.get(Constant.TAG_TO_USER_NAME);
         
-        return respXmlBuilder.buildTextXML(myName, clientName, "熊孩子，怎么现在才关注我！");
+        return respXmlBuilder.buildTextXML(myName, clientName, Constant.SUBSCRIBE_MSG);
     }
     
     /**
