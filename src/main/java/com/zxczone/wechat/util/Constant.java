@@ -38,10 +38,16 @@ public class Constant {
     public static final String TULING_ERROR_MSG = "你在说啥，有点听不懂。。。";
     public static final String BAIDUMAP_ERROR_MSG = "我不认识这个地方呀";
     public static final String VOICE_RECOG_NOT_OPEN_MSG = "未开通语音识别功能";
-    public static final String SUBSCRIBE_MSG = 
-    		  "你好！我是小狐狸，很高兴认识你！\n " +
-    		  "你可以跟我聊天，也可以问我天气、火车票、机票、新闻甚至是菜谱哦！\n" +
-    		  "比如这样问我，“上海天气”、“北京到上海火车／飞机”、“体育新闻”、“鱼香肉丝怎么做”等等";
+    public static final String SUBSCRIBE_MSG =  
+    		  "你好！我是小狐狸，很高兴认识你！\n"
+    		+ "你可以跟我聊天，另外也可以问我天气、火车票、机票、新闻甚至是菜谱哦！\n"
+    		+ "比如：\n"
+    		+ "“上海天气”\n"
+    		+ "“北京到上海火车（或飞机）”\n"
+    		+ "“体育新闻”\n"
+    		+ "“鱼香肉丝怎么做”\n"
+    		+ "......\n"
+    		+ "对了，还可以跟我语音聊天哦～";
     
     public static final String TRAIN_MSG_BANNER = "已帮您找到以下车次:";
     public static final String QUNAR_ROOT_URL = "http://touch.qunar.com/h5/train";
