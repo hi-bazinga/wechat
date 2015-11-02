@@ -1,4 +1,4 @@
-package com.zxczone.wechat.parser;
+package com.zxczone.wechat.common;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
