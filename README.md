@@ -1,2 +1,2 @@
 # wechat
-wechat official ID: zxc_zone, Name: ZXCZONE
+Follow this Wechat Official Account and chat with Little Fox: zxc_zone
