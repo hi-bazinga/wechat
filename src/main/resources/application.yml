@@ -1,0 +1,27 @@
+
+server:
+  port: 8080
+  servlet:
+    context-path: /littlefox
+
+wechat:
+  appid: ******
+  appsecret: ******
+
+
+baidumap:
+  api:
+    key: ******
+
+
+tuling:
+  api:
+    key: ******
+
+logging:
+  file: /home/ec2-user/wechat/littlefox.log
+  level:
+    root: info
+
+
+
