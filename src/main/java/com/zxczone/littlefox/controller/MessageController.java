@@ -69,11 +69,11 @@ public class MessageController {
         logger.info(String.format("[handleMessage] signature: %s, timestamp: %s, nonce: %s",
                 signature, timestamp, nonce));
         
-//        if (!(signature != null && timestamp != null && nonce != null
-//                && ValidateUtil.checkSignature(signature, timestamp, nonce))) {
-//            logger.error("Validation failed!");
-//            return null;
-//        }
+        if (!(signature != null && timestamp != null && nonce != null
+                && ValidateUtil.checkSignature(signature, timestamp, nonce))) {
+            logger.error("Validation failed!");
+            return null;
+        }
         
         String resXML = processRequest(request);
         logger.info("[handleMessage] Response XML: \n" + resXML);
